@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WALK LOCK</title>
+    <style>
+        /* Hacker Style Theme with Glitch Effects */
+        body {
+            background-color: #0a0a0a;
+            color: #0f0; /* Matrix Green */
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            text-align: center;
+        }
+        
+        /* Stylish Glitch Text Effect for Title */
+        .glitch {
+            font-size: 4rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            position: relative;
+            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                0.025em 0.04em 0 #fffc00;
+            animation: glitch 725ms infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
+            15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
+            16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00; }
+            49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00; }
+            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00; }
+            99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00; }
+            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff, -0.04em -0.025em 0 #fffc00; }
+        }
+
+        /* Container Styling */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #0f0;
+            padding: 20px;
+            box-shadow: 0 0 15px #0f0;
+            background-color: #000;
+        }
+
+        /* Game Area and Character */
+        #game-area {
+            height: 150px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid #0f0;
+        }
+
+        #character {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            font-size: 40px;
+            animation: none; /* Will be controlled by JS */
+        }
+
+        /* Walking Animation */
+        @keyframes walk {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw - 100px)); }
+        }
+
+        /* Button Styling */
+        button {
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            margin: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            background-color: #0f0;
+            color: #000;
+            box-shadow: 0 0 10px #0f0;
+        }
+
+        /* Stats and Withdrawal Panel */
+        #stats {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        #withdraw-section {
+            margin-top: 30px;
+            border-top: 1px solid #0f0;
+            padding-top: 20px;
+            display: none; /* Hidden by default, shows at 1000 coins */
+        }
+
+        input, select {
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 8px;
+            margin: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Terminal-like output */
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #0f0;
+            height: 100px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Game Title with Glitch Effect -->
+        <h1 class="glitch">WALK LOCK</h1>
+        
+        <!-- Game Instructions -->
+        <p>START BUTTON dabayein, ladka chalne lagega. STOP dabayein, ruk jayega.</p>
+        
+        <!-- Game Area Where Character Walks -->
+        <div id="game-area">
+            <div id="character">🚶</div>
+        </div>
+        
+        <!-- Control Buttons -->
+        <div>
+            <button id="start-btn">START</button>
+            <button id="stop-btn">STOP</button>
+        </div>
+        
+        <!-- Stats Display -->
+        <div id="stats">
+            <p>COINS: <span id="coins">0</span> / 1000</p>
+            <p>USDT: <span id="usdt">0.00</span></p>
+            <p>STATUS: <span id="status">READY</span></p>
+        </div>
+        
+        <!-- Withdrawal Section (Hidden Initially) -->
+        <div id="withdraw-section">
+            <h3>WITHDRAW EARNINGS</h3>
+            <p>20 USDT = 1000 COINS</p>
+            <select id="network">
+                <option value="BEP20">BEP20</option>
+                <option value="TRC20">TRC20</option>
+            </select>
+            <input type="text" id="address" placeholder="Your Wallet Address">
+            <button id="withdraw-btn">WITHDRAW</button>
+        </div>
+        
+        <!-- Terminal Output -->
+        <div id="output">
+            > System initialized. Press START to begin.<br>
+        </div>
+    </div>
+
+    <script>
+        // Game State Variables
+        let isWalking = false;
+        let coins = 0;
+        let animationInterval;
+        let coinInterval;
+        let lastResetTime = new Date().setHours(0,0,0,0); // Midnight
+
+        // DOM Elements
+        const character = document.getElementById('character');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const coinsDisplay = document.getElementById('coins');
+        const usdtDisplay = document.getElementById('usdt');
+        const statusDisplay = document.getElementById('status');
+        const withdrawSection = document.getElementById('withdraw-section');
+        const withdrawBtn = document.getElementById('withdraw-btn');
+        const addressInput = document.getElementById('address');
+        const networkSelect = document.getElementById('network');
+        const output = document.getElementById('output');
+
+        // Check if it's a new day and reset if needed
+        function checkDailyReset() {
+            const now = new Date();
+            const todayMidnight = new Date().setHours(0,0,0,0);
+            
+            if (lastResetTime < todayMidnight) {
+                coins = 0;
+                updateDisplay();
+                lastResetTime = todayMidnight;
+                addToOutput('> System reset for new day.');
+            }
+            
+            // Check if it's after midnight and before 1 AM
+            if (now.getHours() === 0) {
+                startBtn.disabled = false;
+                statusDisplay.textContent = 'READY';
+                addToOutput('> System unlocked for new day.');
+            }
+        }
+
+        // Start the walking animation and coin accumulation
+        function startWalking() {
+            if (isWalking) return;
+            
+            // Check if already reached 1000 coins today
+            if (coins >= 1000) {
+                addToOutput('> Daily limit reached. Try again after 12:00 AM.');
+                return;
+            }
+            
+            isWalking = true;
+            statusDisplay.textContent = 'WALKING...';
+            startBtn.disabled = true;
+            
+            // Start walking animation
+            character.style.animation = 'walk 3s linear infinite';
+            
+            // Add to output
+            addToOutput('> Movement initialized. Earning coins...');
+            
+            // Accumulate coins every second
+            coinInterval = setInterval(() => {
+                coins++;
+                updateDisplay();
+                
+                // Check if reached 1000 coins
+                if (coins >= 1000) {
+                    stopWalking();
+                    withdrawSection.style.display = 'block';
+                    addToOutput('> Target achieved. 20 USDT unlocked for withdrawal.');
+                    // Schedule reset at midnight
+                    setTimeout(checkDailyReset, getMillisUntilMidnight());
+                }
+            }, 1000); // 1 coin per second
+        }
+
+        // Stop the walking animation
+        function stopWalking() {
+            if (!isWalking) return;
+            
+            isWalking = false;
+            statusDisplay.textContent = 'STOPPED';
+            startBtn.disabled = false;
+            
+            // Stop animation
+            character.style.animation = 'none';
+            
+            // Stop coin accumulation
+            clearInterval(coinInterval);
+            
+            addToOutput('> Process halted. ' + coins + ' coins accumulated.');
+        }
+
+        // Update the display with current values
+        function updateDisplay() {
+            coinsDisplay.textContent = coins;
+            usdtDisplay.textContent = (coins / 50).toFixed(2); // 1000 coins = 20 USDT
+        }
+
+        // Add message to terminal output
+        function addToOutput(message) {
+            output.innerHTML += '> ' + message + '<br>';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Calculate milliseconds until midnight
+        function getMillisUntilMidnight() {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            return midnight - now;
+        }
+
+        // Handle withdrawal request
+        function handleWithdrawal() {
+            const address = addressInput.value.trim();
+            const network = networkSelect.value;
+            
+            if (!address) {
+                addToOutput('> Error: Please enter a valid wallet address.');
+                return;
+            }
+            
+            addToOutput('> Withdrawal request: 20 USDT to ' + address + ' via ' + network);
+            addToOutput('> Processing... (This is a simulation)');
+            
+            // Simulate processing delay
+            setTimeout(() => {
+                addToOutput('> Success! 20 USDT sent. Allow 24-48 hours for processing.');
+                coins = 0;
+                updateDisplay();
+                withdrawSection.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startWalking);
+        stopBtn.addEventListener('click', stopWalking);
+        withdrawBtn.addEventListener('click', handleWithdrawal);
+
+        // Initialize game
+        checkDailyReset();
+        updateDisplay();
+        addToOutput('> System ready. Awaiting commands...');
+    </script>
+</body>
+</html>
